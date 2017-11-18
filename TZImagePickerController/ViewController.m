@@ -57,7 +57,9 @@
         _imagePickerVc = [[UIImagePickerController alloc] init];
         _imagePickerVc.delegate = self;
         // set appearance / 改变相册选择页的导航栏外观
-        _imagePickerVc.navigationBar.barTintColor = self.navigationController.navigationBar.barTintColor;
+        if (iOS7Later) {
+            _imagePickerVc.navigationBar.barTintColor = self.navigationController.navigationBar.barTintColor;
+        }
         _imagePickerVc.navigationBar.tintColor = self.navigationController.navigationBar.tintColor;
         UIBarButtonItem *tzBarItem, *BarItem;
         if (iOS9Later) {
@@ -236,7 +238,9 @@
     
     // 2. Set the appearance
     // 2. 在这里设置imagePickerVc的外观
-    // imagePickerVc.navigationBar.barTintColor = [UIColor greenColor];
+    // if (iOS7Later) {
+        // imagePickerVc.navigationBar.barTintColor = [UIColor greenColor];
+    // }
     // imagePickerVc.oKButtonTitleColorDisabled = [UIColor lightGrayColor];
     // imagePickerVc.oKButtonTitleColorNormal = [UIColor greenColor];
     // imagePickerVc.navigationBar.translucent = NO;
@@ -281,7 +285,7 @@
     /*
     [imagePickerVc setNavLeftBarButtonSettingBlock:^(UIButton *leftButton){
         [leftButton setImage:[UIImage imageNamed:@"back"] forState:UIControlStateNormal];
-        [leftButton setImageEdgeInsets:UIEdgeInsetsMake(0, -20, 0, 20)];
+        [leftButton setImageEdgeInsets:UIEdgeInsetsMake(0, -10, 0, 20)];
     }];
     imagePickerVc.delegate = self;
     */
@@ -492,12 +496,13 @@
     _selectedPhotos = [NSMutableArray arrayWithArray:@[coverImage]];
     _selectedAssets = [NSMutableArray arrayWithArray:@[asset]];
     // open this code to send video / 打开这段代码发送视频
-    // [[TZImageManager manager] getVideoOutputPathWithAsset:asset completion:^(NSString *outputPath) {
-    // NSLog(@"视频导出到本地完成,沙盒路径为:%@",outputPath);
-    // Export completed, send video here, send by outputPath or NSData
-    // 导出完成，在这里写上传代码，通过路径或者通过NSData上传
-    
-    // }];
+    [[TZImageManager manager] getVideoOutputPathWithAsset:asset presetName:AVAssetExportPreset640x480 success:^(NSString *outputPath) {
+        NSLog(@"视频导出到本地完成,沙盒路径为:%@",outputPath);
+        // Export completed, send video here, send by outputPath or NSData
+        // 导出完成，在这里写上传代码，通过路径或者通过NSData上传
+    } failure:^(NSString *errorMessage, NSError *error) {
+        NSLog(@"视频导出失败:%@,error:%@",errorMessage, error);
+    }];
     [_collectionView reloadData];
     // _collectionView.contentSize = CGSizeMake(0, ((_selectedPhotos.count + 2) / 3 ) * (_margin + _itemWH));
 }
